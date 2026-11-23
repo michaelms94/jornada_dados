@@ -48,7 +48,7 @@ A verificação do arquivo `delta_lake/entrypoint.sh` identificou que ele contin
 | silver | 201 | 1,6 MiB |
 | gold | 184 | 1,9 MiB |
 
-![Interface do MinIO com os seis buckets e suas quantidades de objetos](evidencias/01_minio.png)
+![Interface do MinIO com os seis buckets e suas quantidades de objetos](Evidencias//01_minio.png)
 
 ***Evidência 01 — MinIO:** comprova a criação dos buckets exigidos (`raw`, `trusted` e `refined`) e a existência de objetos armazenados. A captura também apresenta `bronze`, `silver` e `gold`, utilizados pelo dbt. Os nomes são conceitualmente relacionados às etapas de tratamento, mas representam **buckets físicos distintos** neste laboratório.*
 
@@ -107,7 +107,7 @@ docker exec -it postgres_oltp psql -U sudoers -d liga_sudoers -c "SELECT COUNT(*
 
 O `dbt.log` apresentou `Completed successfully` para as três execuções.
 
-![Log do dbt com resultados Bronze, Silver e Gold](evidencias/02_dbt.png)
+![Log do dbt com resultados Bronze, Silver e Gold](Evidencias//02_dbt.png)
 
 ***Evidência 02 — dbt:** mostra três execuções concluídas com sucesso: seis modelos Bronze, três Silver e um Gold; nenhum erro registrado nos resumos.*
 
@@ -133,7 +133,7 @@ FROM refined.itens_by_person;
 Time taken: 1.114 seconds, Fetched 1 row(s)
 ```
 
-![Contagem de registros na tabela Refined](evidencias/03_spark.png)
+![Contagem de registros na tabela Refined](Evidencias//03_spark.png)
 
 ***Evidência 03 — Spark / Refined:** mostra 45.936 registros na tabela `refined.itens_by_person`. A estrutura também foi consultada com `DESCRIBE`; esse comando não aparece nesta captura específica.*
 
@@ -156,7 +156,7 @@ Pedido `7726`, geohash `7h6v`, dispositivo `Iphone`, apresentado no resultado da
 
 Pedido `4671`, geohash `6gyf`, dispositivo `Nokia`, apresentado no resultado da consulta em Gold. Também foram observados `Motorola` e `Xaomi`.
 
-![Consultas de exemplos de fraude por geohash (acima) e por dispositivo (abaixo)](evidencias/04_fraudes_exemplos.png)
+![Consultas de exemplos de fraude por geohash (acima) e por dispositivo (abaixo)](Evidencias//04_fraudes_exemplos.png)
 
 * **Evidência 04 — Exemplos de antifraude:** as duas capturas originais foram reunidas em uma figura, sem alterar os comandos nem os resultados. Na parte superior aparecem geohashes fora do conjunto válido do exercício; na parte inferior, dispositivos fora dos modelos esperados. Esta segunda consulta identifica **dispositivo anômalo**, mas não compara dois eventos de um mesmo cliente ao longo do tempo.
 
@@ -183,7 +183,7 @@ FROM gold.itens_by_person;
 
 Cálculo: `178 / 15667 × 100 ≈ 1,14%`.
 
-![Consulta Spark SQL com 15.667 pedidos distintos e 178 sinalizados](evidencias/05_fraudes_taxa.png)
+![Consulta Spark SQL com 15.667 pedidos distintos e 178 sinalizados](Evidencias//05_fraudes_taxa.png)
 
 * **Evidência 05 — Proporção de pedidos suspeitos:** consulta com `COUNT(DISTINCT ...)` identificando 178 pedidos que atendem a pelo menos uma regra simulada, entre 15.667 pedidos distintos analisados (1,14%).
 
