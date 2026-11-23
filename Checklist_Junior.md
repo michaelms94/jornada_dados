@@ -156,7 +156,7 @@ Pedido `7726`, geohash `7h6v`, dispositivo `Iphone`, apresentado no resultado da
 
 Pedido `4671`, geohash `6gyf`, dispositivo `Nokia`, apresentado no resultado da consulta em Gold. Também foram observados `Motorola` e `Xaomi`.
 
-![Consultas de exemplos de fraude por geohash (acima) e por dispositivo (abaixo)](Evidencias//04_fraudes_exemplos.png)
+![Consultas de exemplos de fraude por geohash (acima) e por dispositivo (abaixo)](Evidencias//04_fraude_geo.png)
 
 * **Evidência 04 — Exemplos de antifraude:** as duas capturas originais foram reunidas em uma figura, sem alterar os comandos nem os resultados. Na parte superior aparecem geohashes fora do conjunto válido do exercício; na parte inferior, dispositivos fora dos modelos esperados. Esta segunda consulta identifica **dispositivo anômalo**, mas não compara dois eventos de um mesmo cliente ao longo do tempo.
 
@@ -183,7 +183,7 @@ FROM gold.itens_by_person;
 
 Cálculo: `178 / 15667 × 100 ≈ 1,14%`.
 
-![Consulta Spark SQL com 15.667 pedidos distintos e 178 sinalizados](Evidencias//05_fraudes_taxa.png)
+![Consulta Spark SQL com 15.667 pedidos distintos e 178 sinalizados](Evidencias//05_fraude_device.png)
 
 * **Evidência 05 — Proporção de pedidos suspeitos:** consulta com `COUNT(DISTINCT ...)` identificando 178 pedidos que atendem a pelo menos uma regra simulada, entre 15.667 pedidos distintos analisados (1,14%).
 
