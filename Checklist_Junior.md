@@ -1,12 +1,12 @@
 # ✅ Checklist Júnior — Ponta a ponta funcional
 
-**Aluno:** [preencher nome]  
+**Aluno:** Michael da Mota santos
 **Disciplina:** Fundamentos de Engenharia de Dados — MBA em Engenharia de Dados  
-**Data da execução:** 22/11/2026 (horário de Brasília; alguns logs exibem data/hora UTC)  
+**Data da execução:** 22/11/2026  
 **Repositório-base:** [sudoers-ai/jornada_dados](https://github.com/sudoers-ai/jornada_dados)  
 **Referência de requisitos:** [desafios/desafios.md](https://github.com/sudoers-ai/jornada_dados/blob/main/desafios/desafios.md)  
 **Nível:** Júnior — Ponta a ponta funcional (base)  
-**Evidências visuais:** cinco imagens (as duas consultas de exemplos de fraude foram reunidas em uma única figura)
+**Evidências visuais:** cinco imagens: MinIO, dbt, Spark/Refined, anomalias de geohash e anomalias de dispositivo. A taxa de pedidos suspeitos é documentada em tabela.
 
 > **Critério deste registro:** os itens são avaliados a partir das saídas de terminal e das capturas efetivamente obtidas. Diferenças entre o roteiro, as adaptações locais e as validações adicionais são identificadas no texto.
 
@@ -48,9 +48,9 @@ A verificação do arquivo `delta_lake/entrypoint.sh` identificou que ele contin
 | silver | 201 | 1,6 MiB |
 | gold | 184 | 1,9 MiB |
 
-![Interface do MinIO com os seis buckets e suas quantidades de objetos](Evidencias//01_minio.png)
+![Interface do MinIO com os seis buckets e suas quantidades de objetos](Evidencias/01_minio.png)
 
-***Evidência 01 — MinIO:** comprova a criação dos buckets exigidos (`raw`, `trusted` e `refined`) e a existência de objetos armazenados. A captura também apresenta `bronze`, `silver` e `gold`, utilizados pelo dbt. Os nomes são conceitualmente relacionados às etapas de tratamento, mas representam **buckets físicos distintos** neste laboratório.*
+**Evidência 01 — MinIO:** comprova a criação dos buckets exigidos (`raw`, `trusted` e `refined`) e a existência de objetos armazenados. A captura também apresenta `bronze`, `silver` e `gold`, utilizados pelo dbt. Os nomes são conceitualmente relacionados às etapas de tratamento, mas representam **buckets físicos distintos** neste laboratório.
 
 ## 3. Geração histórica e streaming
 
@@ -107,9 +107,9 @@ docker exec -it postgres_oltp psql -U sudoers -d liga_sudoers -c "SELECT COUNT(*
 
 O `dbt.log` apresentou `Completed successfully` para as três execuções.
 
-![Log do dbt com resultados Bronze, Silver e Gold](Evidencias//02_dbt.png)
+![Log do dbt com resultados Bronze, Silver e Gold](Evidencias/02_dbt.png)
 
-***Evidência 02 — dbt:** mostra três execuções concluídas com sucesso: seis modelos Bronze, três Silver e um Gold; nenhum erro registrado nos resumos.*
+**Evidência 02 — dbt:** mostra três execuções concluídas com sucesso: seis modelos Bronze, três Silver e um Gold; nenhum erro registrado nos resumos.
 
 **Ressalva sobre o DW:** a evidência confirma as materializações executadas pelo dbt no Spark/MinIO. Não foi registrada uma validação independente de novas materializações na instância **PostgreSQL OLAP** após o dbt; portanto, não se deve afirmar que esse destino específico foi validado.
 
@@ -133,9 +133,9 @@ FROM refined.itens_by_person;
 Time taken: 1.114 seconds, Fetched 1 row(s)
 ```
 
-![Contagem de registros na tabela Refined](Evidencias//03_spark.png)
+![Contagem de registros na tabela Refined](Evidencias/03_spark.png)
 
-***Evidência 03 — Spark / Refined:** mostra 45.936 registros na tabela `refined.itens_by_person`. A estrutura também foi consultada com `DESCRIBE`; esse comando não aparece nesta captura específica.*
+**Evidência 03 — Spark / Refined:** mostra 45.936 registros na tabela `refined.itens_by_person`. A estrutura também foi consultada com `DESCRIBE`; esse comando não aparece nesta captura específica.
 
 **Observação de qualidade:** a primeira leitura de `raw.dim_pessoas` retornou 21 linhas, incluindo uma linha de cabeçalho do CSV e 20 pessoas. Essa ocorrência merece registro e não deve ser confundida com 21 clientes válidos. A etapa Refined foi materializada e consultada depois.
 
@@ -152,13 +152,17 @@ Esses critérios servem à simulação da atividade; **não são regras gerais d
 
 Pedido `7726`, geohash `7h6v`, dispositivo `Iphone`, apresentado no resultado da consulta em Gold. Outros valores encontrados foram `6v2n` e `6m3p`.
 
+![Consulta de exemplos de fraude por geohash](Evidencias/04_fraude_geo.png)
+
+*Evidência 04 — Anomalia geográfica:* a consulta apresenta pedidos com geohashes fora do conjunto esperado no exercício, como `7h6v`, `6v2n` e `6m3p`. Os valores são exemplos de dados sinalizados pelo critério de localização do simulador.
+
 ### 6.2. Exemplo — dispositivo anômalo
 
 Pedido `4671`, geohash `6gyf`, dispositivo `Nokia`, apresentado no resultado da consulta em Gold. Também foram observados `Motorola` e `Xaomi`.
 
-![Consultas de exemplos de fraude por geohash (acima) e por dispositivo (abaixo)](Evidencias//04_fraude_geo.png)
+![Consulta de exemplos de anomalia por dispositivo](Evidencias/05_fraude_device.png)
 
-* **Evidência 04 — Exemplos de antifraude:** as duas capturas originais foram reunidas em uma figura, sem alterar os comandos nem os resultados. Na parte superior aparecem geohashes fora do conjunto válido do exercício; na parte inferior, dispositivos fora dos modelos esperados. Esta segunda consulta identifica **dispositivo anômalo**, mas não compara dois eventos de um mesmo cliente ao longo do tempo.
+*Evidência 05 — Dispositivo anômalo:* a consulta identifica dispositivos fora do conjunto esperado pelo simulador. Ela não compara dois eventos de um mesmo cliente ao longo do tempo, portanto não comprova isoladamente uma troca temporal de dispositivo.
 
 ### 6.3. Proporção de pedidos sinalizados
 
@@ -183,9 +187,7 @@ FROM gold.itens_by_person;
 
 Cálculo: `178 / 15667 × 100 ≈ 1,14%`.
 
-![Consulta Spark SQL com 15.667 pedidos distintos e 178 sinalizados](Evidencias//05_fraude_device.png)
-
-* **Evidência 05 — Proporção de pedidos suspeitos:** consulta com `COUNT(DISTINCT ...)` identificando 178 pedidos que atendem a pelo menos uma regra simulada, entre 15.667 pedidos distintos analisados (1,14%).
+A consulta `COUNT(DISTINCT ...)` identificou 178 pedidos que atendem a pelo menos uma condição simplificada de anomalia entre 15.667 pedidos distintos analisados (1,14%). Esse resultado foi registrado em terminal e é apresentado na tabela acima, sem adicionar um sexto print.
 
 **Atenção ao período de referência:** esses indicadores foram coletados **antes da última execução do gerador histórico**, que elevou a tabela `pedidos` do PostgreSQL OLTP para 16.088 registros. Não foi feita nova execução de dbt/Gold após essa carga; por isso **não se devem equiparar os 15.667 pedidos distintos da Gold aos 16.088 pedidos atuais do OLTP**.
 
@@ -215,9 +217,3 @@ Foi possível executar o ambiente Docker do projeto, gerar novos dados por strea
 
 ---
 
-**Referências**  
-- [Desafio Júnior oficial](https://github.com/sudoers-ai/jornada_dados/blob/main/desafios/desafios.md)  
-- [Quickstart](https://github.com/sudoers-ai/jornada_dados/blob/main/quickstart/README.md)  
-- [Delta Lake](https://github.com/sudoers-ai/jornada_dados/blob/main/delta_lake/README.md)  
-- [dbt](https://github.com/sudoers-ai/jornada_dados/blob/main/dbt_project/README.md)  
-- [Gerador histórico da atividade anterior](https://github.com/sudoers-ai/liga_sudoers/blob/main/data_simulator/liga_sudoers_historico.py)
